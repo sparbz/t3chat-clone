@@ -1,0 +1,246 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* EXACT COLORS FROM ORIGINAL T3.CHAT */
+  --sidebar-wine: #1f1320;      /* Wine-tinted dark - sidebar */
+  --main-slate: #1a1625;        /* Slate purple - main area */
+  --button-pink: #a8537d;       /* Pink buttons */
+  --button-pink-hover: #b85f89; /* Brighter on hover */
+  --banner-tan: #8b6f47;        /* Tan warning banner */
+  
+  /* Legacy mappings for compatibility */
+  --bg-main: var(--main-slate);
+  --bg-sidebar: var(--sidebar-wine);
+  --accent-primary: var(--button-pink);
+  --accent-hover: var(--button-pink-hover);
+  --warning-banner: var(--banner-tan);
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #a8a3b8;
+  --text-muted: #6b6979;
+  
+  /* UI Elements */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --hover-bg-strong: rgba(255, 255, 255, 0.07);
+  
+  /* Functional Colors */
+  --color-success: #4ade80;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+}
+
+/* Theme variables */
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--color-accent-purple);
+  color: var(--color-text-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent-purple);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Typing animation */
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Shimmer animation for example prompts */
+@keyframes shimmer {
+  0% { 
+    opacity: 0; 
+    transform: translateX(-100%); 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateX(100%); 
+  }
+}
+
+
+
+/* Primary Button Styling */
+.btn-primary {
+  background: var(--accent-primary);
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Input placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+
+
+/* Breathing Animation */
+@keyframes breathe {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.01); }
+}
+
+.breathing {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+
+
+/* Elegant Fade-In Animation */
+@keyframes elegantFadeIn {
+  0% { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* Parallax Shift */
+@keyframes parallaxShift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-10px); }
+}
+
+.animate-elegant-fade {
+  animation: elegantFadeIn 0.5s ease-out forwards;
+}
+
+
+.parallax-hover {
+  transition: transform 0.3s ease-out;
+}
+
+.parallax-hover:hover {
+  transform: translateX(-5px) translateY(-2px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  /* Hide sidebar on mobile by default */
+  aside {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  aside.open {
+    transform: translateX(0);
+  }
+  
+  /* Overlay when sidebar is open */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    display: none;
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+  
+  /* Main content takes full width on mobile */
+  main {
+    margin-left: 0 !important;
+  }
+  
+  /* Quick actions wrap on mobile */
+  .quick-actions {
+    flex-wrap: wrap;
+  }
+}
