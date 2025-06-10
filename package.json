@@ -1,0 +1,20 @@
+{
+  "name": "t3chat-clone",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "t3chat-clone-ui",
+    "t3chat-clone-api"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:ui\" \"npm run dev:api\"",
+    "dev:ui": "npm run dev --workspace=t3chat-clone-ui",
+    "dev:api": "npm run start:dev --workspace=t3chat-clone-api",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
