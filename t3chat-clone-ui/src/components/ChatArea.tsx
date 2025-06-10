@@ -133,27 +133,27 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
             <div className="flex gap-2.5 justify-center mb-10 flex-wrap">
               <button 
                 onClick={() => setSelectedCategory('create')}
-                className="quick-action-button min-w-[120px] flex items-center justify-center gap-2 px-5 py-3 rounded-[10px] text-sm font-normal cursor-pointer transition-all duration-200"
+                className="glass min-w-[130px] flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl text-sm font-medium cursor-pointer transition-all duration-300 group"
                 style={{
-                  backgroundColor: selectedCategory === 'create' ? 'var(--accent-primary)' : 'transparent',
-                  border: selectedCategory === 'create' ? '1px solid var(--accent-primary)' : '1px solid var(--border-light)',
-                  color: selectedCategory === 'create' ? 'var(--text-on-primary, white)' : 'var(--text-secondary)',
-                  backdropFilter: 'blur(8px)',
-                  boxShadow: selectedCategory === 'create' ? '0 2px 8px rgba(194, 24, 91, 0.25)' : 'none'
+                  backgroundColor: selectedCategory === 'create' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.05)',
+                  border: selectedCategory === 'create' ? '1px solid var(--accent-primary)' : '1px solid rgba(255, 255, 255, 0.1)',
+                  color: selectedCategory === 'create' ? 'var(--text-on-primary, white)' : 'var(--text-primary)',
+                  boxShadow: selectedCategory === 'create' ? '0 8px 32px rgba(236, 72, 153, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)' : '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+                  transform: selectedCategory === 'create' ? 'scale(1.05)' : 'scale(1)'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== 'create') {
                     e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
                     e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05) translateY(-2px)' : 'scale(1.02) translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'create') {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.borderColor = 'var(--border-light)';
                   }
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05)' : 'scale(1)';
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
@@ -181,14 +181,14 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
                     e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
                     e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05) translateY(-2px)' : 'scale(1.02) translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'explore') {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.borderColor = 'var(--border-light)';
                   }
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05)' : 'scale(1)';
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
@@ -212,14 +212,14 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
                     e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
                     e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05) translateY(-2px)' : 'scale(1.02) translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'code') {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.borderColor = 'var(--border-light)';
                   }
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05)' : 'scale(1)';
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
@@ -246,14 +246,14 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
                     e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
                     e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05) translateY(-2px)' : 'scale(1.02) translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'learn') {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.borderColor = 'var(--border-light)';
                   }
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.transform = selectedCategory === 'create' ? 'scale(1.05)' : 'scale(1)';
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
@@ -298,22 +298,25 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
 
         {/* Message Limit Banner */}
         {showMessageLimit && (
-          <div className="fixed bottom-[88px] left-0 right-0 z-20" style={{ paddingLeft: sidebarOpen ? '240px' : '0' }}>
-            <MessageLimitBanner />
+          <div className="fixed bottom-[160px] left-0 right-0 z-20 flex justify-center" style={{ paddingLeft: sidebarOpen ? '240px' : '0' }}>
+            <div className="max-w-[500px] w-full mx-6">
+              <MessageLimitBanner />
+            </div>
           </div>
         )}
 
         {/* Input Section */}
         <div className="fixed bottom-0 left-0 right-0 p-6 z-20" style={{
-          paddingLeft: sidebarOpen ? '260px' : '20px', 
-          borderTop: '1px solid var(--border-subtle)',
-          backgroundColor: 'var(--bg-main)'
+          paddingLeft: sidebarOpen ? '260px' : '20px'
         }}>
           <div className="max-w-[800px] mx-auto w-full">
-            <div className="rounded-lg overflow-hidden transition-all duration-300 focus-within:border-[rgba(168,83,125,0.3)] focus-within:shadow-[0_0_0_1px_rgba(168,83,125,0.1)]"
+            <div className="rounded-2xl overflow-hidden transition-all duration-300 focus-within:shadow-[0_0_40px_rgba(236,72,153,0.3)] group"
               style={{
                 backgroundColor: 'var(--input-bg)',
-                border: '1px solid var(--border-light)'
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid var(--border-light)',
+                boxShadow: '0 2px 8px var(--shadow-light)'
               }}
             >
               <textarea
@@ -329,7 +332,7 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
               
               <div className="flex items-center justify-between px-4 py-3 gap-3" style={{ 
                 borderTop: '1px solid var(--border-subtle)',
-                backgroundColor: 'rgba(0, 0, 0, 0.2)'
+                backgroundColor: 'var(--bg-secondary, rgba(0, 0, 0, 0.05))'
               }}>
                 <div className="flex items-center gap-2">
                   <ModelSelector
@@ -392,7 +395,7 @@ export default function ChatArea({ chatId, onNewMessage, showMessageLimit = fals
                 <button 
                   onClick={() => handleSendMessage()}
                   disabled={!inputValue.trim()}
-                  className="w-8 h-8 rounded-md border-none text-white flex items-center justify-center cursor-pointer ml-auto transition-all duration-200"
+                  className={`w-8 h-8 rounded-md border-none text-white flex items-center justify-center cursor-pointer ml-auto transition-all duration-200 ${inputValue.trim() ? 'animate-pulse-glow' : ''}`}
                   style={{ 
                     backgroundColor: inputValue.trim() ? 'var(--button-pink)' : 'rgba(168, 83, 125, 0.4)',
                     opacity: inputValue.trim() ? 1 : 0.6

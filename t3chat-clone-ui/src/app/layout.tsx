@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 // Use Inter as a close alternative to ProximaVara
 const inter = Inter({
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider>
+          <AnimatedBackground />
           {children}
         </ThemeProvider>
       </body>

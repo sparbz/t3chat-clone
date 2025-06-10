@@ -61,16 +61,19 @@ export default function Home() {
           <div className="h-full flex items-center gap-2">
               <button className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200" 
                 style={{
-                  backgroundColor: 'transparent',
-                  color: 'var(--text-secondary)'
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-light)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--hover-bg)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
+                  e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.04)';
+                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 title="Share">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -87,16 +90,19 @@ export default function Home() {
                 onClick={toggleTheme}
                 className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200" 
                 style={{
-                  backgroundColor: 'transparent',
-                  color: 'var(--text-secondary)'
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-light)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--hover-bg)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
+                  e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.04)';
+                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
                 title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
                 {theme === 'dark' ? (
