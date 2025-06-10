@@ -5,12 +5,14 @@ import { Menu } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import ChatArea from '@/components/ChatArea';
 import MessageLimitBanner from '@/components/MessageLimitBanner';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [messageCount, setMessageCount] = useState(9);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { theme, toggleTheme } = useTheme();
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
@@ -28,46 +30,35 @@ export default function Home() {
   }, [sidebarOpen]);
 
   return (
-    <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--bg-main)' }}>
-      {/* Mobile menu button */}
-      <button 
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 flex items-center justify-center border rounded-lg"
-        style={{ 
-          backgroundColor: 'var(--bg-sidebar)',
-          borderColor: 'var(--border-medium)'
+    <div className="flex h-screen w-full" style={{ backgroundColor: 'var(--bg-sidebar)' }}>
+      <Sidebar 
+        selectedChatId={selectedChatId}
+        onSelectChat={(chatId) => {
+          setSelectedChatId(chatId);
         }}
-      >
-        <Menu size={20} className="text-white" />
-      </button>
-
-      {/* Overlay for mobile */}
-      <div 
-        className={`lg:hidden fixed inset-0 bg-black/50 z-40 ${sidebarOpen ? 'block' : 'hidden'}`}
-        onClick={() => setSidebarOpen(false)}
+        isCollapsed={!sidebarOpen}
+        onToggleCollapse={(collapsed) => setSidebarOpen(!collapsed)}
       />
       
-      <div className={`${sidebarOpen ? 'open' : ''}`}>
-        <Sidebar 
-          selectedChatId={selectedChatId}
-          onSelectChat={(chatId) => {
-            setSelectedChatId(chatId);
-            setSidebarOpen(false);
-          }}
-        />
-      </div>
-      
-      <main className="flex-1 flex flex-col overflow-hidden relative" style={{ 
+      <main className="flex-1 flex flex-col overflow-hidden relative transition-all duration-300" style={{ 
         backgroundColor: 'var(--bg-main)',
-        marginLeft: '-20px',
+        marginLeft: sidebarOpen ? '220px' : '0',
+        marginTop: '8px',
         paddingLeft: '20px',
-        borderRadius: '20px 0 0 20px'
+        borderRadius: '20px 0 0 0',
+        borderTop: '1px solid var(--border-subtle)',
+        borderLeft: '1px solid var(--border-subtle)',
+        boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.05)'
       }}>
-        {/* Top Bar */}
-        <div className="absolute top-0 right-0 left-0 h-16 z-10 px-6">
-          <div className="h-full flex items-center justify-between">
-            <div>{/* Optional breadcrumb */}</div>
-            <div className="flex gap-2">
+        {/* Top Bar with carved out section */}
+        <div className="absolute top-0 right-0 z-10" style={{
+          backgroundColor: 'var(--bg-sidebar)',
+          padding: '12px 16px 12px 24px',
+          borderRadius: '0 0 0 24px',
+          borderLeft: '1px solid var(--border-subtle)',
+          borderBottom: '1px solid var(--border-subtle)'
+        }}>
+          <div className="h-full flex items-center gap-2">
               <button className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200" 
                 style={{
                   backgroundColor: 'transparent',
@@ -83,13 +74,18 @@ export default function Home() {
                 }}
                 title="Share">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M8 3H3v5M17 8V3h-5M12 17h5v-5M3 12v5h5" 
+                  <circle cx="10" cy="10" r="2.5" fill="currentColor"/>
+                  <circle cx="16" cy="4" r="2.5" fill="currentColor"/>
+                  <circle cx="16" cy="16" r="2.5" fill="currentColor"/>
+                  <circle cx="4" cy="10" r="2.5" fill="currentColor"/>
+                  <path d="M10 10L16 4M10 10L16 16M10 10L4 10" 
                         stroke="currentColor" 
-                        strokeWidth="1.5" 
-                        strokeLinecap="round"/>
+                        strokeWidth="1.5"/>
                 </svg>
               </button>
-              <button className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200" 
+              <button 
+                onClick={toggleTheme}
+                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200" 
                 style={{
                   backgroundColor: 'transparent',
                   color: 'var(--text-secondary)'
@@ -102,29 +98,36 @@ export default function Home() {
                   e.currentTarget.style.backgroundColor = 'transparent';
                   e.currentTarget.style.color = 'var(--text-secondary)';
                 }}
-                title="Toggle theme">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="4" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M10 1v2m0 14v2m9-9h-2M3 10H1m14.14 4.14l-1.41 1.41M6.27 6.27L4.86 4.86m10.28 0l-1.41 1.41M6.27 13.73l-1.41 1.41" 
-                        stroke="currentColor" 
-                        strokeWidth="1.5" 
-                        strokeLinecap="round"/>
-                </svg>
+                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                {theme === 'dark' ? (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="4.5" fill="currentColor"/>
+                    <path d="M10 1.5v2.5m0 12v2.5m8.5-8.5h-2.5m-12 0H1.5" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round"/>
+                    <path d="M16.5 3.5l-2 2m-9 9l-2 2m11-2l2 2m-11-11l-2-2" 
+                          stroke="currentColor" 
+                          strokeWidth="1.5" 
+                          strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M17.39 15.908A7 7 0 0 1 4.092 2.61 9 9 0 1 0 17.39 15.908z" 
+                          fill="currentColor"/>
+                  </svg>
+                )}
               </button>
-            </div>
           </div>
         </div>
 
 
-        {/* Message Banner at TOP of main content */}
-        {!isAuthenticated && (
-          <MessageLimitBanner />
-        )}
-        
         <div className="flex flex-col flex-1">
           <ChatArea 
             chatId={selectedChatId}
             onNewMessage={() => setMessageCount(prev => prev + 1)}
+            showMessageLimit={!isAuthenticated}
+            sidebarOpen={sidebarOpen}
           />
         </div>
       </main>

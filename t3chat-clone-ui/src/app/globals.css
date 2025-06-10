@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* Dark Theme (Default) */
+:root, 
+[data-theme="dark"] {
   /* EXACT COLORS FROM ORIGINAL T3.CHAT */
   --sidebar-wine: #1f1320;      /* Wine-tinted dark - sidebar */
   --main-slate: #1a1625;        /* Slate purple - main area */
@@ -40,12 +42,78 @@
   --color-border-hover: rgba(255, 255, 255, 0.12);
 }
 
+/* Light Theme */
+[data-theme="light"] {
+  /* Pink/Rose Tones */
+  --primary-pink: #C2185B;        /* Deep rose pink for primary actions */
+  --primary-rose: #AD1457;        /* Darker rose for hover states */
+  --primary-light: #F8BBD0;       /* Light pink for backgrounds */
+  --primary-pale: #FCE4EC;        /* Very light pink for subtle backgrounds */
+  
+  /* Purple Accent */
+  --accent-purple: #7B1FA2;       /* Deep purple for secondary elements */
+  --accent-light: #E1BEE7;        /* Light purple for badges/chips */
+  
+  /* Neutral Colors - Main areas */
+  --main-slate: #FAFAFA;          /* Main background - very light gray */
+  --sidebar-wine: #FAE5EA;        /* Sidebar - light pink tint */
+  --bg-secondary: #F5F5F5;        /* Secondary background */
+  --bg-tertiary: #EEEEEE;         /* Tertiary background */
+  --bg-card: #FFFFFF;             /* Card/container background */
+  
+  /* Button colors */
+  --button-pink: #C2185B;         /* Deep rose pink buttons */
+  --button-pink-hover: #AD1457;   /* Darker rose on hover */
+  
+  /* Warning banner */
+  --banner-tan: #FFF8E1;          /* Pale yellow for warnings */
+  
+  /* Legacy mappings for compatibility */
+  --bg-main: var(--main-slate);
+  --bg-sidebar: var(--sidebar-wine);
+  --accent-primary: var(--button-pink);
+  --accent-hover: var(--button-pink-hover);
+  --warning-banner: var(--banner-tan);
+  
+  /* Text Colors */
+  --text-primary: #4A148C;        /* Deep purple text - matching screenshot */
+  --text-secondary: #7B1FA2;      /* Medium purple text */
+  --text-muted: #9575CD;          /* Light purple text */
+  --text-on-primary: #FFFFFF;     /* Text on primary colors */
+  
+  /* Border Colors */
+  --border-subtle: #FCE4EC;       /* Very light pink borders */
+  --border-light: #F8BBD0;        /* Light pink borders */
+  --border-medium: #F48FB1;       /* Medium pink borders */
+  --border-focus: #C2185B;        /* Focus state borders */
+  
+  /* UI Elements */
+  --input-bg: #FFFFFF;            /* Input background */
+  --hover-bg: #FCE4EC;            /* Very light pink hover */
+  --hover-bg-strong: #F8BBD0;     /* Light pink hover */
+  
+  /* Shadow Colors */
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --shadow-heavy: rgba(0, 0, 0, 0.15);
+  
+  /* Functional Colors */
+  --color-success: #4CAF50;
+  --color-error: #F44336;
+  --color-warning: #FF6F00;       /* Darker orange for warning text */
+  
+  /* Borders */
+  --color-border: #F8BBD0;
+  --color-border-hover: #F48FB1;
+}
+
 /* Theme variables */
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  border: 0 solid #e5e7eb;
 }
 
 html,
@@ -58,8 +126,9 @@ body {
 body {
   background: var(--bg-main);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size: 14px;
+  font-family: var(--font-inter), ProximaVara, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-size: 13px;
+  font-weight: 400;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -142,7 +211,7 @@ textarea {
 .btn-primary {
   background: var(--accent-primary);
   color: white;
-  font-weight: 500;
+  font-weight: 400;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
@@ -185,6 +254,42 @@ textarea::placeholder {
   }
 }
 
+/* Fade-In Animation for sidebar toggle */
+@keyframes fade-in {
+  0% { 
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Dropdown Animation - appears from bottom */
+@keyframes dropdown-up {
+  0% { 
+    opacity: 0;
+    transform: translateY(-90%);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(-100%);
+  }
+}
+
+/* Slide-In Animation for sidebar expansion */
+@keyframes slide-in {
+  0% { 
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 
 /* Parallax Shift */
 @keyframes parallaxShift {
@@ -196,6 +301,18 @@ textarea::placeholder {
   animation: elegantFadeIn 0.5s ease-out forwards;
 }
 
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+.animate-dropdown-up {
+  animation: dropdown-up 0.2s ease-out forwards;
+}
+
 
 .parallax-hover {
   transition: transform 0.3s ease-out;
@@ -203,6 +320,93 @@ textarea::placeholder {
 
 .parallax-hover:hover {
   transform: translateX(-5px) translateY(-2px);
+}
+
+/* Carved section smooth curve */
+.carved-section::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -20px;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border-top-right-radius: 20px;
+  box-shadow: 10px -10px 0 10px var(--bg-sidebar);
+  pointer-events: none;
+}
+
+.carved-section::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border-bottom-left-radius: 20px;
+  box-shadow: -10px 10px 0 10px var(--bg-sidebar);
+  pointer-events: none;
+}
+
+/* Light mode specific overrides */
+[data-theme="light"] .quick-action-button {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-light) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="light"] .quick-action-button:hover {
+  background-color: var(--primary-pale) !important;
+  color: var(--primary-pink) !important;
+  border-color: var(--primary-light) !important;
+}
+
+[data-theme="light"] .example-prompt {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-light) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="light"] .example-prompt:hover {
+  background-color: var(--primary-pale) !important;
+  color: var(--primary-pink) !important;
+  border-color: var(--primary-light) !important;
+}
+
+/* Light mode button styling */
+[data-theme="light"] .btn-primary {
+  background: var(--primary-pink) !important;
+  color: var(--text-on-primary) !important;
+  box-shadow: 0 2px 4px var(--shadow-light);
+  font-weight: 500;
+}
+
+[data-theme="light"] .btn-primary:hover {
+  background: var(--primary-rose) !important;
+  box-shadow: 0 4px 8px var(--shadow-medium);
+  transform: translateY(-1px);
+}
+
+/* Light mode input styling */
+[data-theme="light"] input,
+[data-theme="light"] textarea {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-light) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus {
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
+}
+
+/* Light mode message banner */
+[data-theme="light"] .message-banner {
+  background-color: var(--banner-tan) !important;
+  border: 1px solid #F9A825 !important;
+  color: var(--color-warning) !important;
 }
 
 /* Responsive styles */

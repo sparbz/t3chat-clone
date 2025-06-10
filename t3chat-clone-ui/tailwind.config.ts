@@ -34,7 +34,7 @@ const config: Config = {
         warning: 'var(--color-warning)',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', 'sans-serif'],
+        sans: ['var(--font-inter)', 'ProximaVara', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'],
         mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', 'monospace'],
       },
       borderRadius: {

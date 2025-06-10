@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Globe, Sparkles, Search as SearchIcon, Code, BookOpen, ChevronDown, Maximize2, Sun } from 'lucide-react';
+import { Send, Globe } from 'lucide-react';
 import Message from './Message';
 import MessageLimitBanner from './MessageLimitBanner';
+import ModelSelector, { Model } from './ModelSelector';
 
 interface ChatAreaProps {
   chatId: string | null;
   onNewMessage: () => void;
+  showMessageLimit?: boolean;
+  sidebarOpen?: boolean;
 }
 
 interface MessageType {
@@ -17,25 +20,51 @@ interface MessageType {
   timestamp: Date;
 }
 
-const AI_MODELS = [
-  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
-  { id: 'gpt-4', name: 'GPT-4' },
-  { id: 'claude-3', name: 'Claude 3' },
+const AI_MODELS: Model[] = [
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', description: 'Fast & efficient', isNew: true },
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', description: 'Advanced reasoning', isPro: true },
+  { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Latest GPT model', isPro: true },
+  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast responses' },
+  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: 'Balanced performance', isPro: true },
+  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: 'Quick & efficient' },
+  { id: 'llama-3', name: 'Llama 3', description: 'Open source model' },
+  { id: 'deepseek-r1', name: 'DeepSeek R1', description: 'Chinese optimization', isNew: true, isPro: true },
 ];
 
-const EXAMPLE_PROMPTS = [
-  'How does AI work?',
-  'Are black holes real?',
-  'How many Rs are in the word "strawberry"?',
-  'What is the meaning of life?'
-];
+const EXAMPLE_PROMPTS: Record<string, string[]> = {
+  create: [
+    'Write a short story about a robot discovering emotions',
+    'Design a logo concept for a sustainable coffee shop',
+    'Create a haiku about artificial intelligence',
+    'Generate a recipe using only 5 ingredients'
+  ],
+  explore: [
+    'Good books for fans of Rick Rubin',
+    'Hidden gems in Japanese cuisine',
+    'Underrated sci-fi movies from the 90s',
+    'Interesting facts about deep sea creatures'
+  ],
+  code: [
+    'Write code to invert a binary search tree in Python',
+    'Create a responsive navigation bar with CSS',
+    'Build a simple REST API with Node.js',
+    'Implement a debounce function in JavaScript'
+  ],
+  learn: [
+    'Beginner\'s guide to TypeScript',
+    'How does blockchain technology work?',
+    'Explain quantum computing in simple terms',
+    'What are the basics of machine learning?'
+  ]
+};
 
-export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
+export default function ChatArea({ chatId, onNewMessage, showMessageLimit = false, sidebarOpen = true }: ChatAreaProps) {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0]);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('create');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -94,143 +123,169 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
   if (!chatId || messages.length === 0) {
     return (
       <div className="flex-1 flex flex-col relative">
-        {/* Top Right Icons */}
-        <div className="absolute top-5 right-5 flex gap-3 z-10">
-          <button 
-            className="w-9 h-9 bg-transparent border-none text-[#6b7280] cursor-pointer flex items-center justify-center rounded-lg transition-all duration-200 hover:bg-white/5 hover:text-[#a8a3b8]"
-            title="Share"
-          >
-            <Maximize2 size={20} />
-          </button>
-          <button 
-            className="w-9 h-9 bg-transparent border-none text-[#6b7280] cursor-pointer flex items-center justify-center rounded-lg transition-all duration-200 hover:bg-white/5 hover:text-[#a8a3b8]"
-            title="Toggle theme"
-          >
-            <Sun size={20} />
-          </button>
-        </div>
 
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto px-5 py-10 flex items-center justify-center pb-[120px]">
           <div className="w-full max-w-[600px] text-center">
-            <h1 className="text-[32px] font-semibold text-white mb-12">How can I help you?</h1>
+            <h1 className="text-[28px] font-normal mb-12" style={{ color: 'var(--text-primary)' }}>How can I help you?</h1>
             
             {/* Quick Actions */}
-            <div className="flex gap-4 justify-center mb-12 flex-wrap">
+            <div className="flex gap-2.5 justify-center mb-10 flex-wrap">
               <button 
-                onClick={() => console.log('Quick action clicked: Create')}
-                className="min-w-[120px] flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] text-sm font-medium cursor-pointer transition-all duration-200"
+                onClick={() => setSelectedCategory('create')}
+                className="quick-action-button min-w-[120px] flex items-center justify-center gap-2 px-5 py-3 rounded-[10px] text-sm font-normal cursor-pointer transition-all duration-200"
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(8px)'
+                  backgroundColor: selectedCategory === 'create' ? 'var(--accent-primary)' : 'transparent',
+                  border: selectedCategory === 'create' ? '1px solid var(--accent-primary)' : '1px solid var(--border-light)',
+                  color: selectedCategory === 'create' ? 'var(--text-on-primary, white)' : 'var(--text-secondary)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: selectedCategory === 'create' ? '0 2px 8px rgba(194, 24, 91, 0.25)' : 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                  if (selectedCategory !== 'create') {
+                    e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  }
                   e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                  if (selectedCategory !== 'create') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'var(--border-light)';
+                  }
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <Sparkles size={20} className="flex-shrink-0" />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
+                  <path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5L10 2z" 
+                        fill="currentColor"/>
+                  <path d="M16 14l.75 2.25L19 17l-2.25.75L16 20l-.75-2.25L13 17l2.25-.75L16 14z" 
+                        fill="currentColor" opacity="0.6"/>
+                  <path d="M5 15l.5 1.5L7 17l-1.5.5L5 19l-.5-1.5L3 17l1.5-.5L5 15z" 
+                        fill="currentColor" opacity="0.4"/>
+                </svg>
                 <span>Create</span>
               </button>
               <button 
-                onClick={() => console.log('Quick action clicked: Explore')}
-                className="min-w-[120px] flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] text-sm font-medium cursor-pointer transition-all duration-200"
+                onClick={() => setSelectedCategory('explore')}
+                className="quick-action-button min-w-[120px] flex items-center justify-center gap-2 px-5 py-3 rounded-[10px] text-sm font-normal cursor-pointer transition-all duration-200"
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(8px)'
+                  backgroundColor: selectedCategory === 'explore' ? 'var(--accent-primary)' : 'transparent',
+                  border: selectedCategory === 'explore' ? '1px solid var(--accent-primary)' : '1px solid var(--border-light)',
+                  color: selectedCategory === 'explore' ? 'var(--text-on-primary, white)' : 'var(--text-secondary)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: selectedCategory === 'explore' ? '0 2px 8px rgba(194, 24, 91, 0.25)' : 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                  if (selectedCategory !== 'explore') {
+                    e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  }
                   e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                  if (selectedCategory !== 'explore') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'var(--border-light)';
+                  }
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <SearchIcon size={20} className="flex-shrink-0" />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
+                  <rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <path d="M7 7h6m-6 3h6m-6 3h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
                 <span>Explore</span>
               </button>
               <button 
-                onClick={() => console.log('Quick action clicked: Code')}
-                className="min-w-[120px] flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] text-sm font-medium cursor-pointer transition-all duration-200"
+                onClick={() => setSelectedCategory('code')}
+                className="quick-action-button min-w-[120px] flex items-center justify-center gap-2 px-5 py-3 rounded-[10px] text-sm font-normal cursor-pointer transition-all duration-200"
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(8px)'
+                  backgroundColor: selectedCategory === 'code' ? 'var(--accent-primary)' : 'transparent',
+                  border: selectedCategory === 'code' ? '1px solid var(--accent-primary)' : '1px solid var(--border-light)',
+                  color: selectedCategory === 'code' ? 'var(--text-on-primary, white)' : 'var(--text-secondary)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: selectedCategory === 'code' ? '0 2px 8px rgba(194, 24, 91, 0.25)' : 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                  if (selectedCategory !== 'code') {
+                    e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  }
                   e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                  if (selectedCategory !== 'code') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'var(--border-light)';
+                  }
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <Code size={20} className="flex-shrink-0" />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
+                  <path d="M7 7l-3 3l3 3m6-6l3 3l-3 3m-1-9l-2 10" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"/>
+                </svg>
                 <span>Code</span>
               </button>
               <button 
-                onClick={() => console.log('Quick action clicked: Learn')}
-                className="min-w-[120px] flex items-center justify-center gap-2 px-6 py-3.5 rounded-[10px] text-sm font-medium cursor-pointer transition-all duration-200"
+                onClick={() => setSelectedCategory('learn')}
+                className="quick-action-button min-w-[120px] flex items-center justify-center gap-2 px-5 py-3 rounded-[10px] text-sm font-normal cursor-pointer transition-all duration-200"
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(8px)'
+                  backgroundColor: selectedCategory === 'learn' ? 'var(--accent-primary)' : 'transparent',
+                  border: selectedCategory === 'learn' ? '1px solid var(--accent-primary)' : '1px solid var(--border-light)',
+                  color: selectedCategory === 'learn' ? 'var(--text-on-primary, white)' : 'var(--text-secondary)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: selectedCategory === 'learn' ? '0 2px 8px rgba(194, 24, 91, 0.25)' : 'none'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                  if (selectedCategory !== 'learn') {
+                    e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  }
                   e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                  if (selectedCategory !== 'learn') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'var(--border-light)';
+                  }
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <BookOpen size={20} className="flex-shrink-0" />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
+                  <path d="M10 4C10 4 7 3 4 3C2.5 3 2 3.5 2 5v10c0 1 .5 1.5 2 1.5c3 0 6 1 6 1s3-1 6-1c1.5 0 2-.5 2-1.5V5c0-1.5-.5-2-2-2c-3 0-6 1-6 1z" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"/>
+                  <path d="M10 4v12.5" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
                 <span>Learn</span>
               </button>
             </div>
 
             {/* Example Prompts */}
-            <div className="flex flex-col gap-3 w-full max-w-[500px] mx-auto">
-              {EXAMPLE_PROMPTS.map((prompt, index) => (
+            <div className="flex flex-col gap-2.5 w-full max-w-[500px] mx-auto">
+              {EXAMPLE_PROMPTS[selectedCategory].map((prompt, index) => (
                 <button
                   key={index}
                   onClick={() => handleSendMessage(prompt)}
-                  className="group w-full px-5 py-4 rounded-lg text-sm font-normal text-left cursor-pointer transition-all duration-200"
+                  className="example-prompt group w-full px-3 py-2.5 rounded-lg text-sm font-normal text-left cursor-pointer transition-all duration-200"
                   style={{
                     backgroundColor: 'transparent',
-                    border: '1px solid var(--border-light)',
+                    border: 'none',
                     color: 'var(--text-secondary)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--input-bg)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                    e.currentTarget.style.backgroundColor = 'var(--hover-bg)';
                     e.currentTarget.style.color = 'var(--text-primary)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.borderColor = 'var(--border-light)';
                     e.currentTarget.style.color = 'var(--text-secondary)';
                   }}
                 >
@@ -241,8 +296,16 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
           </div>
         </div>
 
+        {/* Message Limit Banner */}
+        {showMessageLimit && (
+          <div className="fixed bottom-[88px] left-0 right-0 z-20" style={{ paddingLeft: sidebarOpen ? '240px' : '0' }}>
+            <MessageLimitBanner />
+          </div>
+        )}
+
         {/* Input Section */}
-        <div className="fixed bottom-0 left-[280px] right-0 p-5 z-20" style={{ 
+        <div className="fixed bottom-0 left-0 right-0 p-6 z-20" style={{
+          paddingLeft: sidebarOpen ? '260px' : '20px', 
           borderTop: '1px solid var(--border-subtle)',
           backgroundColor: 'var(--bg-main)'
         }}>
@@ -259,7 +322,7 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message here..."
-                className="w-full px-5 py-4 bg-transparent border-0 text-white text-base leading-relaxed resize-none outline-none font-inherit min-h-[24px] max-h-[200px] block"
+                className="w-full px-5 py-3.5 bg-transparent border-0 text-white text-base leading-relaxed resize-none outline-none font-inherit min-h-[24px] max-h-[200px] block"
                 style={{ color: 'var(--text-primary)' }}
                 rows={1}
               />
@@ -269,50 +332,13 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
                 backgroundColor: 'rgba(0, 0, 0, 0.2)'
               }}>
                 <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowModelDropdown(!showModelDropdown)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer transition-all duration-200"
-                      style={{
-                        backgroundColor: 'var(--hover-bg)',
-                        border: '1px solid var(--border-medium)',
-                        color: 'var(--text-primary)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--hover-bg-strong)';
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--hover-bg)';
-                        e.currentTarget.style.borderColor = 'var(--border-medium)';
-                      }}
-                    >
-                      <span>{selectedModel.name}</span>
-                      <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                        <path d="M1 1l4 4 4-4"/>
-                      </svg>
-                    </button>
-                    
-                    {showModelDropdown && (
-                      <div className="absolute bottom-full left-0 mb-2 border rounded-lg shadow-lg overflow-hidden" style={{ 
-                        backgroundColor: 'var(--bg-sidebar)',
-                        borderColor: 'var(--border-medium)'
-                      }}>
-                        {AI_MODELS.map((model) => (
-                          <button
-                            key={model.id}
-                            onClick={() => {
-                              setSelectedModel(model);
-                              setShowModelDropdown(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors whitespace-nowrap"
-                          >
-                            {model.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <ModelSelector
+                    models={AI_MODELS}
+                    selectedModel={selectedModel}
+                    onSelectModel={setSelectedModel}
+                    isOpen={showModelDropdown}
+                    onOpenChange={setShowModelDropdown}
+                  />
 
                   <div className="flex items-center gap-2">
                     <button className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm cursor-pointer transition-all duration-200"
@@ -353,7 +379,12 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
                         e.currentTarget.style.color = 'var(--text-secondary)';
                       }}
                     >
-                      <Paperclip size={16} />
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 3v10m5-5H3" 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round"/>
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -416,8 +447,16 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
         </div>
       </div>
 
+      {/* Message Limit Banner */}
+      {showMessageLimit && (
+        <div className="fixed bottom-[88px] left-0 right-0 z-20" style={{ paddingLeft: sidebarOpen ? '240px' : '0' }}>
+          <MessageLimitBanner />
+        </div>
+      )}
+
       {/* Input Section */}
-      <div className="fixed bottom-0 left-[280px] right-0 p-5 z-20" style={{ 
+      <div className="fixed bottom-0 left-0 right-0 p-5 z-20" style={{
+        paddingLeft: sidebarOpen ? '260px' : '20px', 
         borderTop: '1px solid var(--border-subtle)',
         backgroundColor: 'var(--bg-main)'
       }}>
@@ -441,34 +480,13 @@ export default function ChatArea({ chatId, onNewMessage }: ChatAreaProps) {
               backgroundColor: 'rgba(0, 0, 0, 0.2)'
             }}>
               <div className="flex items-center gap-2">
-                <div className="relative">
-                  <button
-                    onClick={() => setShowModelDropdown(!showModelDropdown)}
-                    className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-md text-white text-sm cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/[0.15]"
-                  >
-                    <span>{selectedModel.name}</span>
-                    <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-                      <path d="M1 1l4 4 4-4"/>
-                    </svg>
-                  </button>
-                  
-                  {showModelDropdown && (
-                    <div className="absolute bottom-full left-0 mb-2 bg-[#1a1625] border border-white/10 rounded-lg shadow-lg overflow-hidden">
-                      {AI_MODELS.map((model) => (
-                        <button
-                          key={model.id}
-                          onClick={() => {
-                            setSelectedModel(model);
-                            setShowModelDropdown(false);
-                          }}
-                          className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors whitespace-nowrap"
-                        >
-                          {model.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <ModelSelector
+                  models={AI_MODELS}
+                  selectedModel={selectedModel}
+                  onSelectModel={setSelectedModel}
+                  isOpen={showModelDropdown}
+                  onOpenChange={setShowModelDropdown}
+                />
 
                 <div className="flex items-center gap-2">
                   <button className="flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 rounded-md text-[#a8a3b8] text-sm cursor-pointer transition-all duration-200 hover:bg-white/5 hover:text-white hover:border-white/[0.15]">
